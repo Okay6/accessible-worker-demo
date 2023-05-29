@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Accessible Worker Demo</title>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <button id="start-button">Start Count</button>
+        <button id="stop-button" disabled>Stop Count</button>
+        <span>Count: </span><span id="count"></span>
+    </div>
+    <hr>
+    <div>
+        <button id="get-uuid">Get UUID</button>
+        <span>UUID: </span><span id="uuid"></span>
+    </div>
+    <hr>
+    <div class="row">
+        <label>
+            <input type="text" id="str">
+        </label>
+        end with
+        <label>
+            <input type="text" id="suffix">
+        </label>
+        <button id="confirm-endWith">Confirm EndWith</button>
+        <span>Res: </span><span id="endWithPanel"></span>
+    </div>
+    <hr>
+    <div class="row">
+        <label>
+            <input type="number" id="first-number">
+        </label>
+        add
+        <label>
+            <input type="number" id="secondary-number">
+        </label>
+        <button id="calculate">Calculate</button>
+        <span>Res: </span><span id="add-res"></span>
+    </div>
+    <hr>
+    <div class="row">
+        <label>
+            <input type="text" id="name">
+        </label>
+        <button id="combine-message">Combine Message</button>
+        <span>Msg: </span><span id="msg-panel"></span>
+    </div>
+</div>
+</body>
+</html>

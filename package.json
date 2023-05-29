@@ -1,0 +1,31 @@
+{
+  "name": "accessible-worker-demo",
+  "version": "1.0.0",
+  "description": "A simple demo for accessible-worker",
+  "scripts": {
+    "build":"webpack",
+    "serve": "webpack-dev-server --config webpack.config.js",
+    "awm": "webpack --config webpack.aw.config.js"
+  },
+  "author": "HongXiang Li",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/lodash": "^4.14.195",
+    "@types/uuid": "^9.0.1",
+    "css-loader": "^6.8.1",
+    "hook-shell-script-webpack-plugin": "^0.3.0",
+    "html-webpack-plugin": "^5.5.1",
+    "lodash": "^4.17.21",
+    "style-loader": "^3.3.3",
+    "terser-webpack-plugin": "^5.3.9",
+    "ts-loader": "^9.4.2",
+    "typescript": "~4.9.5",
+    "webpack": "^5.82.1",
+    "webpack-cli": "^5.1.1",
+    "webpack-dev-server": "^4.15.0"
+  },
+  "dependencies": {
+    "accessible-worker": "^0.0.1-dev-1",
+    "uuid": "^9.0.0"
+  }
+}
