@@ -46,6 +46,8 @@ module.exports = {
         port: 3000,
         static: 'dist',
         hot: true,
+        https: false,
+        allowedHosts:'all',
     },
     mode: "development",
 }
