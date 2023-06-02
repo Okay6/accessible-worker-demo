@@ -16,6 +16,8 @@ type InputEvents = {
     END_WITH: (param: { str: string, suffix: string }) => void
     BEGIN_COUNT: () => void
     STOP_COUNT: () => void
+    INIT_CANVAS: (params: { canvas: OffscreenCanvas, transfer: Transferable[] }) => void
+    DRAW_RECT: (params: { width: number, height: number }) => void
 }
 
 type OutputEvents = {
@@ -44,6 +46,9 @@ class MyAccessibleWorker extends ChannelWorkerDefinition<InputEvents, OutputEven
     @GlobalVariable<any>()
     timer: any
 
+    @GlobalVariable<OffscreenCanvas>()
+    canvas!: OffscreenCanvas
+
     @SubscribeMessage<InputEvents>('COMBINE_MESSAGE')
     async combineMessage(data: InferParams<InputEvents, 'COMBINE_MESSAGE'>) {
         this.emit('COMBINED_MESSAGE', `${this.prefix} ${data.name}`)
@@ -67,6 +72,26 @@ class MyAccessibleWorker extends ChannelWorkerDefinition<InputEvents, OutputEven
     @SubscribeMessage<InputEvents>('STOP_COUNT')
     async stopCount() {
         clearInterval(this.timer)
+    }
+
+    @SubscribeMessage<InputEvents>('INIT_CANVAS')
+    async initCanvas(param: InferParams<InputEvents, 'INIT_CANVAS'>) {
+        if (!this.canvas) {
+            this.canvas = param.canvas
+        }
+    }
+
+    @SubscribeMessage<InputEvents>('DRAW_RECT')
+    async drawRect(param: InferParams<InputEvents, 'DRAW_RECT'>) {
+        const _w = this.canvas.width
+        this.canvas.width = _w
+        const ctx = this.canvas.getContext('2d')
+        if (ctx) {
+            const _ctx = ctx as OffscreenCanvasRenderingContext2D
+            _ctx.rect(100, 100, param.width, param.height);
+            _ctx.fillStyle = 'red';
+            _ctx.fill()
+        }
     }
 
 
@@ -100,9 +125,13 @@ const functionSet = {
     const combineButton = document.getElementById('combine-message') as HTMLButtonElement
     const msgPanel = document.getElementById('msg-panel') as HTMLSpanElement
 
+    const canvas = document.getElementById('canvas') as HTMLCanvasElement
+    const offscreenCanvas = canvas.transferControlToOffscreen()
+    const drawRect = document.getElementById('draw-rect') as HTMLButtonElement
 
     // register Channel Worker
     const channelWorkerClient = await AccessibleWorkerFactory.registerChannelWorker<InputEvents, OutputEvents>(MyAccessibleWorker)
+    channelWorkerClient.emit("INIT_CANVAS", {canvas: offscreenCanvas, transfer: [offscreenCanvas]})
     // register Functional Worker
     const functionalWorkerClient = await AccessibleWorkerFactory
         .registerFunctionSet(functionSet,
@@ -119,7 +148,7 @@ const functionSet = {
     channelWorkerClient.on('END_WITH', res => {
         endWithPanel.innerText = res ? 'YES' : 'NO'
     })
-    channelWorkerClient.on('COMBINED_MESSAGE',res=>{
+    channelWorkerClient.on('COMBINED_MESSAGE', res => {
         msgPanel.innerText = res
     })
 
@@ -135,8 +164,8 @@ const functionSet = {
         startButton.disabled = false
     }
 
-    combineButton.onclick = ()=>{
-        channelWorkerClient.emit('COMBINE_MESSAGE',{name:nameInput.value})
+    combineButton.onclick = () => {
+        channelWorkerClient.emit('COMBINE_MESSAGE', {name: nameInput.value})
     }
 
     confirmEndWithButton.onclick = () => {
@@ -148,12 +177,16 @@ const functionSet = {
     }
 
     calculateButton.onclick = async () => {
-        const firstNum = firstNumberInput.value !== null && firstNumberInput.value !==undefined ? Number(firstNumberInput.value): 0;
-        const secondNum = secondaryNumberInput.value !== null && secondaryNumberInput.value !==undefined ? Number(secondaryNumberInput.value): 0;
-        const res = await functionalWorkerClient.add(firstNum,secondNum)
+        const firstNum = firstNumberInput.value !== null && firstNumberInput.value !== undefined ? Number(firstNumberInput.value) : 0;
+        const secondNum = secondaryNumberInput.value !== null && secondaryNumberInput.value !== undefined ? Number(secondaryNumberInput.value) : 0;
+        const res = await functionalWorkerClient.add(firstNum, secondNum)
         addResPanel.innerText = res.toString()
     }
-
+    drawRect.onclick = () => {
+        const randomW = Math.round(Math.random() * 200)
+        const randomH = Math.round(Math.random() * 100)
+        channelWorkerClient.emit('DRAW_RECT', {width: randomW, height: randomH})
+    }
 
 })()
 
